@@ -1,0 +1,121 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+/* ---------- BASE STYLES ---------- */
+
+body{
+  margin:0;
+  padding:0;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,"Open Sans","Helvetica Neue",sans-serif;
+  background:#f3f4f6;
+  color:#111827;
+}
+
+a{
+  text-decoration:none;
+  transition:0.2s ease;
+}
+
+button{
+  cursor:pointer;
+  transition:0.2s ease;
+}
+
+
+/* ---------- LAYOUT ---------- */
+
+.container{
+  max-width:1200px;
+  margin:auto;
+  padding:20px;
+}
+
+.card{
+  background:#ffffff;
+  border-radius:12px;
+  padding:20px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.08);
+  transition:0.2s ease;
+}
+
+.card:hover{
+  box-shadow:0 8px 18px rgba(0,0,0,0.12);
+  transform:translateY(-2px);
+}
+
+
+/* ---------- HEADER ---------- */
+
+.header-bar{
+  background:#0f172a;
+  color:white;
+}
+
+.gov-title{
+  font-weight:700;
+  letter-spacing:0.5px;
+}
+
+
+/* ---------- BUTTONS ---------- */
+
+.btn{
+  padding:10px 20px;
+  border-radius:6px;
+  font-weight:600;
+  color:white;
+  display:inline-block;
+}
+
+/* Vote Button */
+
+.vote-button{
+  background:#15803d;
+}
+
+.vote-button:hover{
+  background:#166534;
+}
+
+/* Admin Buttons */
+
+.admin-button-start{
+  background:#16a34a;
+}
+
+.admin-button-start:hover{
+  background:#15803d;
+}
+
+.admin-button-end{
+  background:#dc2626;
+}
+
+.admin-button-end:hover{
+  background:#b91c1c;
+}
+
+
+/* ---------- BADGES ---------- */
+
+.result-badge{
+  background:#1e3a8a;
+  color:white;
+  padding:6px 12px;
+  border-radius:6px;
+  font-size:14px;
+  font-weight:500;
+}
+
+
+/* ---------- FOOTER ---------- */
+
+.footer{
+  background:#1e3a8a;
+  color:white;
+  text-align:center;
+  padding:18px;
+  margin-top:40px;
+}
