@@ -1,29 +1,16 @@
-import api from "./apiClient"
+import api from "../utils/api";
 
 export const getElections = async () => {
+  const res = await api.get("/elections");
+  return res.data;
+};
 
-  const res = await api.get("/elections")
-
-  return res.data
-}
-
-export const createElection = async (data) => {
-
-  const res = await api.post("/elections", data)
-
-  return res.data
-}
+export const getActiveElection = async () => {
+  const res = await api.get("/elections/active");
+  return res.data;
+};
 
 export const startElection = async (id) => {
-
-  const res = await api.put(`/elections/start/${id}`)
-
-  return res.data
-}
-
-export const endElection = async (id) => {
-
-  const res = await api.put(`/elections/end/${id}`)
-
-  return res.data
-}
+  const res = await api.put(`/elections/activate/${id}`);
+  return res.data;
+};

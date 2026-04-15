@@ -1,21 +1,33 @@
 const express = require("express");
 const router = express.Router();
 
-const {
-  castVote,
-  getResults,
-  getVoteStatus // 🔥 NEW
-} = require("../controllers/voteController");
+// ✅ Import controller
+const voteController = require("../controllers/voteController");
 
+// ✅ Auth middleware
 const { protect } = require("../middleware/authMiddleware");
 
-/* Cast Vote */
-router.post("/cast", protect, castVote);
+/* ================= ROUTES ================= */
 
-/* Check if user already voted */
-router.get("/status", protect, getVoteStatus); // 🔥 NEW
+/**
+ * @route   POST /api/votes/cast
+ * @desc    Cast a vote
+ * @access  Private
+ */
+router.post("/cast", protect, voteController.castVote);
 
-/* Get election results */
-router.get("/results", getResults);
+/**
+ * @route   GET /api/votes/status?electionId=123
+ * @desc    Check if user has voted
+ * @access  Private
+ */
+router.get("/status", protect, voteController.getVoteStatus);
+
+/**
+ * @route   GET /api/votes/results
+ * @desc    Get election results
+ * @access  Public
+ */
+router.get("/results", voteController.getResults);
 
 module.exports = router;

@@ -1,57 +1,52 @@
 "use client";
 
-import { useState } from "react";
 import api from "../utils/api";
 
-export default function ConfirmVoteButton({ candidateId, electionId }) {
-
-  const [loading, setLoading] = useState(false);
+export default function VoteButton({ candidateId, electionId }) {
 
   const handleVote = async () => {
     try {
-      setLoading(true);
+      const token = localStorage.getItem("token");
 
-      console.log("Sending Vote:", { candidateId, electionId });
+      console.log("Sending:", candidateId, electionId);
 
-      const token = localStorage.getItem("token"); // ✅ IMPORTANT
+      if (!candidateId || !electionId) {
+        alert("Invalid data");
+        return;
+      }
 
       const res = await api.post(
-        "/vote/cast",
+        "/votes/cast",
         {
           candidateId,
           electionId
         },
         {
           headers: {
-            Authorization: `Bearer ${token}` // ✅ FIX
+            Authorization: `Bearer ${token}`
           }
         }
       );
 
-      console.log("Response:", res.data);
-
-      alert("✅ Vote submitted successfully!");
+      alert("✅ Vote successful");
 
     } catch (error) {
-      console.log("ERROR:", error?.response || error);
+      console.log("ERROR:", error);
 
-      alert(
-        error?.response?.data?.message ||
-        error.message ||
-        "Voting failed"
-      );
-    } finally {
-      setLoading(false);
+      if (error.response) {
+        alert(error.response.data.message);
+      } else {
+        alert("Server error");
+      }
     }
   };
 
   return (
     <button
       onClick={handleVote}
-      disabled={loading}
-      className="mt-6 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+      className="bg-blue-600 text-white px-4 py-2 mt-2"
     >
-      {loading ? "Submitting..." : "Confirm Vote"}
+      Vote
     </button>
   );
 }

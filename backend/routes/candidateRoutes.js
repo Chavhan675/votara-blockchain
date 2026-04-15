@@ -1,25 +1,11 @@
 const express = require("express");
-
 const router = express.Router();
 
-const {
-    createCandidate,
-    getCandidates,
-    getCandidateById
-} = require("../controllers/candidateController");
+const Candidate = require("../models/Candidates");
 
-const { protect } = require("../middleware/authMiddleware");
-
-/* Admin Create Candidate */
-
-router.post("/", protect, createCandidate);
-
-/* Get All Candidates */
-
-router.get("/", getCandidates);
-
-/* Get Single Candidate */
-
-router.get("/:id", getCandidateById);
+router.get("/", async (req, res) => {
+  const candidates = await Candidate.find();
+  res.json(candidates);
+});
 
 module.exports = router;

@@ -1,63 +1,85 @@
 "use client";
 
-import ProtectedRoute from "../../../components/ProtectedRoute";
-import candidates from "../../../data/candidates"; // ✅ FIXED PATH
+import { useEffect, useState } from "react";
+import api from "../../../utils/api";
 import VoteButton from "../../../components/VoteButton";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 
 export default function VotePage() {
+  const [candidates, setCandidates] = useState([]);
+  const [electionId, setElectionId] = useState(null);
+  const [error, setError] = useState("");
 
-  const router = useRouter();
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const c = await api.get("/candidates");
+        setCandidates(c.data);
+
+        const e = await api.get("/elections/active");
+        setElectionId(e.data._id);
+      } catch (err) {
+        console.log(err);
+
+        if (err.response?.status === 404) {
+          setError("No active election");
+        } else {
+          setError("Server error");
+        }
+      }
+    };
+
+    load();
+  }, []);
+
+  if (error) {
+    return <p className="text-center mt-10 text-red-500">{error}</p>;
+  }
+
+  if (!electionId) {
+    return <p className="text-center mt-10">Loading election...</p>;
+  }
 
   return (
-    <ProtectedRoute role="voter">
+    <div className="p-6 max-w-xl mx-auto">
+      <h1 className="text-2xl font-bold text-center mb-6">
+        Cast Your Vote
+      </h1>
 
-      <div className="max-w-6xl mx-auto p-6">
+      {candidates.map((c) => (
+        <div
+          key={c._id}
+          className="border rounded-lg p-6 mb-5 text-center shadow hover:shadow-md transition"
+        >
+          {/* PARTY LOGO */}
+          <div className="flex justify-center mb-4">
+            <Image
+              src={
+                c.party === "BJP"
+                  ? "/images/candidates/bjp.png"
+                  : c.party === "Congress"
+                  ? "/images/candidates/cng.png"
+                  : "/images/candidates/aap.png"
+              }
+              alt="party logo"
+              width={80}
+              height={80}
+              className="object-contain"
+            />
+          </div>
 
-        <h1 className="text-3xl font-bold text-center mb-10">
-          Cast Your Vote
-        </h1>
+          {/* PARTY NAME */}
+          <h2 className="text-lg font-semibold mb-4">
+            {c.party}
+          </h2>
 
-        <div className="grid md:grid-cols-3 gap-8">
-
-          {candidates.map((candidate) => (
-
-            <div
-              key={candidate.id}
-              onClick={() => router.push(`/voter/vote/${candidate.id}`)}
-              className="bg-white shadow-lg rounded-xl p-6 text-center cursor-pointer"
-            >
-
-              <Image
-                src={candidate.image}
-                alt={candidate.name}
-                width={120}
-                height={120}
-                className="mx-auto rounded-full"
-              />
-
-              <h2 className="text-lg font-bold mt-4">
-                {candidate.name}
-              </h2>
-
-              <p className="text-gray-600">
-                {candidate.party}
-              </p>
-
-              {/* Prevent click bubbling */}
-              <div onClick={(e) => e.stopPropagation()}>
-                <VoteButton candidateId={candidate.id} />
-              </div>
-
-            </div>
-
-          ))}
-
+          {/* VOTE BUTTON */}
+          <VoteButton
+            candidateId={c._id}
+            electionId={electionId}
+          />
         </div>
-
-      </div>
-
-    </ProtectedRoute>
+      ))}
+    </div>
   );
 }

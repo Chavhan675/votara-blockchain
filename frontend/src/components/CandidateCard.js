@@ -1,59 +1,38 @@
-"use client"
-
-import Image from "next/image"
-
 export default function CandidateCard({ candidate }) {
+  return (
+    <div className="bg-white shadow-md rounded-2xl p-6 text-center hover:shadow-xl transition duration-300">
 
-const partyLogos = {
-"BJP": "/images/bjp.png",
-"Congress": "/images/cng.png",
-"AAP": "/images/aap.png"
-}
+      {/* Candidate Image */}
+      <div className="w-28 h-28 mx-auto mb-4">
+        <img
+          src={candidate.image}
+          alt={candidate.name}
+          className="w-full h-full object-cover rounded-full border-2 border-blue-500"
+        />
+      </div>
 
-return(
+      {/* Name */}
+      <h2 className="text-xl font-bold text-blue-900">
+        {candidate.name}
+      </h2>
 
-<div className="bg-white shadow-lg rounded-xl p-6 text-center hover:shadow-xl transition">
+      {/* Party */}
+      <p className="text-gray-600">{candidate.party}</p>
 
-<Image
-src={candidate.image}
-alt={candidate.name}
-width={150}
-height={150}
-className="mx-auto rounded-full"
-/>
+      {/* Constituency */}
+      <p className="text-sm text-gray-500 mt-1">
+        Constituency: {candidate.constituency}
+      </p>
 
-<h3 className="text-xl font-bold text-blue-900 mt-4">
-{candidate.name}
-</h3>
+      {/* Role */}
+      <p className="text-sm text-gray-500">
+        {candidate.role}
+      </p>
 
-<p className="text-gray-600 font-medium">
-{candidate.party}
-</p>
-
-{/* Party Logo */}
-
-{partyLogos[candidate.party] && (
-
-<Image
-src={partyLogos[candidate.party]}
-alt={candidate.party}
-width={50}
-height={50}
-className="mx-auto mt-2"
-/>
-
-)}
-
-<p className="text-sm text-gray-500">
-Constituency: {candidate.constituency}
-</p>
-
-<p className="text-gray-600 mt-3 text-sm">
-{candidate.description}
-</p>
-
-</div>
-
-)
-
+      {/* Description */}
+      <p className="text-sm text-gray-600 mt-3 italic">
+        "{candidate.description}"
+      </p>
+    </div>
+  );
 }

@@ -1,28 +1,33 @@
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 
-const ElectionSchema = new mongoose.Schema({
+const electionSchema = new mongoose.Schema(
+  {
+    title: {
+      type: String,
+      required: true
+    },
 
-title:{
-type:String,
-required:true
-},
+    description: {
+      type: String,
+      default: ""
+    },
 
-startDate:{
-type:Date,
-required:true
-},
+    startDate: {
+      type: Date,
+      default: Date.now // ✅ auto set
+    },
 
-endDate:{
-type:Date,
-required:true
-},
+    endDate: {
+      type: Date,
+      default: () => new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // ✅ 7 days later
+    },
 
-status:{
-type:String,
-enum:["upcoming","active","ended"],
-default:"upcoming"
-}
+    isActive: {
+      type: Boolean,
+      default: false
+    }
+  },
+  { timestamps: true }
+);
 
-},{timestamps:true})
-
-module.exports = mongoose.model("Election",ElectionSchema)
+module.exports = mongoose.model("Election", electionSchema);

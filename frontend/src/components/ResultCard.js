@@ -1,60 +1,79 @@
-"use client"
+export default function ResultCard({ candidate, rank }) {
 
-import Image from "next/image"
+  // 🔥 Map candidate name → image
+  const getImage = (name) => {
+    const n = name.toLowerCase()
 
-export default function ResultCard({ candidate, maxVotes }){
+    if (n.includes("modi")) return "/images/candidates/modi.png"
+    if (n.includes("rahul")) return "/images/candidates/rahul.png"
+    if (n.includes("kejriwal")) return "/images/candidates/kejriwal.png"
 
-  const percentage = maxVotes
-    ? Math.round((candidate.votes / maxVotes) * 100)
-    : 0
+    return "/default-user.png"
+  }
 
-  return(
+  return (
 
-    <div className="bg-white shadow-md rounded-xl p-6 text-center hover:shadow-lg transition">
+    <div
+      className={`p-6 rounded-xl shadow-md transition-all duration-300 ${
+        rank === 1
+          ? "border-2 border-green-500 bg-green-50 scale-105"
+          : "bg-white"
+      }`}
+    >
 
-      {/* Candidate Image */}
+      {/* Rank Badge */}
+      <div className="text-center mb-3">
 
-      <div className="flex justify-center mb-4">
+        {rank === 1 && (
+          <p className="text-green-600 font-bold text-lg">
+            🥇 Winner
+          </p>
+        )}
 
-        <Image
-          src={candidate.image || "/images/default-candidate.png"}
-          alt={candidate.name}
-          width={100}
-          height={100}
-          className="rounded-full object-cover"
-        />
+        {rank === 2 && (
+          <p className="text-gray-500 font-semibold">
+            🥈 2nd Place
+          </p>
+        )}
+
+        {rank === 3 && (
+          <p className="text-orange-500 font-semibold">
+            🥉 3rd Place
+          </p>
+        )}
 
       </div>
 
-      {/* Candidate Info */}
+      {/* ✅ Candidate Image (FIXED) */}
+      <img
+        src={getImage(candidate.name)}
+        alt={candidate.name}
+        className="w-20 h-20 rounded-full mx-auto mb-4 object-cover border"
+      />
 
-      <h2 className="text-lg font-semibold text-blue-900">
+      {/* Name */}
+      <h2 className="text-center text-lg font-bold text-blue-700">
         {candidate.name}
       </h2>
 
-      <p className="text-gray-600">
-        {candidate.party}
+      {/* Votes */}
+      <p className="text-center mt-2 font-semibold">
+        Votes: {candidate.votes}
       </p>
 
-      {/* Vote Count */}
-
-      <div className="mt-4 text-blue-900 font-bold">
-        Votes: {candidate.votes}
-      </div>
-
-      {/* Vote Progress */}
-
-      <div className="mt-3 w-full bg-gray-200 rounded-full h-3">
+      {/* Progress Bar */}
+      <div className="w-full bg-gray-200 rounded-full h-3 mt-4">
 
         <div
-          className="bg-blue-900 h-3 rounded-full"
-          style={{ width: `${percentage}%` }}
-        />
+          className="bg-blue-500 h-3 rounded-full transition-all duration-500"
+          style={{ width: `${candidate.percentage}%` }}
+        ></div>
 
       </div>
 
-      <p className="text-sm text-gray-500 mt-1">
-        {percentage}% of votes
+      {/* Percentage */}
+      <p className="text-center text-sm text-gray-500 mt-2">
+        {candidate.percentage}% of votes
       </p>
 
     </div>

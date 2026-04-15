@@ -6,27 +6,49 @@ class VoteService {
 
     async recordVote(voterId, candidateId, electionId) {
 
-        const voteData = {
-            voter: voterId,
-            candidate: candidateId,
-            election: electionId
-        };
+        try {
 
-        const block = voteBlockchain.addVoteBlock(voteData);
+            // ✅ Validate input
+            if (!voterId || !candidateId || !electionId) {
+                throw new Error("Missing required fields");
+            }
 
-        const vote = await Vote.create({
-            voter: voterId,
-            candidate: candidateId,
-            election: electionId,
-            blockchainHash: block.hash
-        });
+            // ✅ Check candidate exists
+            const candidate = await Candidate.findById(candidateId);
+            if (!candidate) {
+                throw new Error("Candidate not found");
+            }
 
-        await Candidate.findByIdAndUpdate(
-            candidateId,
-            { $inc: { voteCount: 1 } }
-        );
+            // ✅ Prepare vote data
+            const voteData = {
+                voter: voterId,
+                candidate: candidateId,
+                election: electionId
+            };
 
-        return vote;
+            // ✅ Add to blockchain
+            const block = voteBlockchain.addVoteBlock(voteData);
+
+            // ✅ Save vote in DB
+            const vote = await Vote.create({
+                voter: voterId,
+                candidate: candidateId,
+                election: electionId,
+                blockchainHash: block.hash
+            });
+
+            // ✅ Increment vote count
+            await Candidate.findByIdAndUpdate(
+                candidateId,
+                { $inc: { voteCount: 1 } }
+            );
+
+            return vote;
+
+        } catch (error) {
+            console.error("Vote Error:", error.message);
+            throw error;
+        }
 
     }
 

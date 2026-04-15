@@ -4,76 +4,106 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import axios from "axios"
 
-export default function RegisterPage(){
+export default function RegisterPage() {
 
   const router = useRouter()
 
-  const [form,setForm] = useState({
-    name:"",
-    email:"",
-    voterId:"",
-    password:""
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    voterId: "",
+    password: ""
   })
 
-  const [loading,setLoading] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
+  const [success, setSuccess] = useState("")
 
-  const handleChange = (e)=>{
+  const handleChange = (e) => {
     setForm({
       ...form,
-      [e.target.name]:e.target.value
+      [e.target.name]: e.target.value
     })
   }
 
-  const handleSubmit = async (e)=>{
+  const validateForm = () => {
+    if (form.password.length < 6) {
+      return "Password must be at least 6 characters"
+    }
+
+    if (!form.email.includes("@")) {
+      return "Invalid email format"
+    }
+
+    if (form.voterId.length < 5) {
+      return "Invalid Voter ID"
+    }
+
+    return null
+  }
+
+  const handleSubmit = async (e) => {
     e.preventDefault()
+
+    setError("")
+    setSuccess("")
+
+    const validationError = validateForm()
+    if (validationError) {
+      setError(validationError)
+      return
+    }
 
     setLoading(true)
 
-    try{
+    try {
 
       const res = await axios.post(
         "http://localhost:5000/api/auth/register",
-        {
-          name:form.name,
-          email:form.email,
-          voterId:form.voterId,
-          password:form.password
-        }
+        form
       )
 
-      alert("Registration Successful")
+      setSuccess("Registration Successful 🎉")
 
-      console.log("User:",res.data)
+      setTimeout(() => {
+        router.push("/auth/login")
+      }, 1500)
 
-      router.push("/auth/login")
+    } catch (err) {
 
-    }catch(error){
-
-      console.error(error)
-
-      if(error.response){
-        alert(error.response.data.message)
-      }else{
-        alert("Server not reachable")
+      if (err.response) {
+        setError(err.response.data.message)
+      } else {
+        setError("Server not reachable")
       }
 
-    }finally{
+    } finally {
       setLoading(false)
     }
-
   }
 
-  return(
+  return (
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-blue-100 to-gray-200">
 
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+      <div className="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-md">
 
-      <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
-
-        <h1 className="text-2xl font-bold text-center mb-6">
-          Voter Registration
+        <h1 className="text-3xl font-bold text-center mb-6 text-blue-900">
+          🗳️ Voter Registration
         </h1>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        {error && (
+          <p className="bg-red-100 text-red-600 p-2 rounded text-sm text-center">
+            {error}
+          </p>
+        )}
+
+        {success && (
+          <p className="bg-green-100 text-green-600 p-2 rounded text-sm text-center">
+            {success}
+          </p>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4 mt-4">
 
           <input
             type="text"
@@ -82,17 +112,17 @@ export default function RegisterPage(){
             value={form.name}
             onChange={handleChange}
             required
-            className="w-full border p-3 rounded"
+            className="w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
 
           <input
             type="email"
             name="email"
-            placeholder="Email"
+            placeholder="Email Address"
             value={form.email}
             onChange={handleChange}
             required
-            className="w-full border p-3 rounded"
+            className="w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
 
           <input
@@ -102,7 +132,7 @@ export default function RegisterPage(){
             value={form.voterId}
             onChange={handleChange}
             required
-            className="w-full border p-3 rounded"
+            className="w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
 
           <input
@@ -112,15 +142,19 @@ export default function RegisterPage(){
             value={form.password}
             onChange={handleChange}
             required
-            className="w-full border p-3 rounded"
+            className="w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-900 text-white p-3 rounded hover:bg-blue-800"
+            className="w-full bg-blue-900 text-white p-3 rounded-lg hover:bg-blue-800 transition duration-200 disabled:bg-gray-400 flex justify-center items-center"
           >
-            {loading ? "Registering..." : "Register"}
+            {loading ? (
+              <span className="animate-pulse">Registering...</span>
+            ) : (
+              "Register"
+            )}
           </button>
 
         </form>
@@ -128,6 +162,5 @@ export default function RegisterPage(){
       </div>
 
     </div>
-
   )
 }

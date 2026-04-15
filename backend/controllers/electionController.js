@@ -1,100 +1,63 @@
 const Election = require("../models/Election");
 
-/* Create Election (Admin) */
-
+/* CREATE */
 exports.createElection = async (req, res) => {
+  try {
+    const { title } = req.body;
 
-    try {
+    const election = await Election.create({
+      title,
+      isActive: false
+    });
 
-        const { title, description, startDate, endDate } = req.body;
-
-        const election = await Election.create({
-            title,
-            description,
-            startDate,
-            endDate
-        });
-
-        res.status(201).json(election);
-
-    } catch (error) {
-
-        res.status(500).json({
-            message: error.message
-        });
-
-    }
-
+    res.status(201).json(election);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
-
-/* Get All Elections */
-
+/* GET ALL */
 exports.getElections = async (req, res) => {
-
-    try {
-
-        const elections = await Election.find();
-
-        res.json(elections);
-
-    } catch (error) {
-
-        res.status(500).json({
-            message: error.message
-        });
-
-    }
-
+  try {
+    const elections = await Election.find();
+    res.json(elections);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
-
-/* Get Active Election */
-
+/* GET ACTIVE */
 exports.getActiveElection = async (req, res) => {
+  try {
+    const election = await Election.findOne({ isActive: true });
 
-    try {
-
-        const election = await Election.findOne({ isActive: true });
-
-        res.json(election);
-
-    } catch (error) {
-
-        res.status(500).json({
-            message: error.message
-        });
-
+    if (!election) {
+      return res.status(404).json({
+        message: "No active election"
+      });
     }
 
+    res.json(election);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
-
-/* Activate Election */
-
+/* ACTIVATE */
 exports.activateElection = async (req, res) => {
+  try {
+    const { id } = req.params;
 
-    try {
+    await Election.updateMany({}, { isActive: false });
 
-        await Election.updateMany({}, { isActive: false });
+    const election = await Election.findByIdAndUpdate(
+      id,
+      { isActive: true },
+      { new: true }
+    );
 
-        const election = await Election.findById(req.params.id);
-
-        election.isActive = true;
-
-        await election.save();
-
-        res.json({
-            message: "Election activated",
-            election
-        });
-
-    } catch (error) {
-
-        res.status(500).json({
-            message: error.message
-        });
-
-    }
-
+    res.json(election);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
