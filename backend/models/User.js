@@ -1,3 +1,5 @@
+// src/backend/models/User.js
+
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 
@@ -39,25 +41,22 @@ const userSchema = new mongoose.Schema(
 { timestamps: true }
 );
 
-/* Password Encryption */
-
+/* 🔐 Password Encryption */
 userSchema.pre("save", async function(next){
 
     if(!this.isModified("password")){
-        next();
+        return next();   // ✅ FIXED
     }
 
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
 
+    next(); // ✅ important
 });
 
-/* Password Compare */
-
+/* 🔑 Password Compare */
 userSchema.methods.matchPassword = async function(enteredPassword){
-
     return await bcrypt.compare(enteredPassword, this.password);
-
 };
 
 module.exports = mongoose.model("User", userSchema);

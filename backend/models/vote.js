@@ -1,3 +1,5 @@
+// src/backend/models/Vote.js
+
 const mongoose = require("mongoose");
 
 const voteSchema = new mongoose.Schema(
@@ -34,7 +36,7 @@ const voteSchema = new mongoose.Schema(
 { timestamps: true }
 );
 
-// 🔒 Prevent duplicate voting
+// prevent duplicate vote
 voteSchema.index({ voter: 1, election: 1 }, { unique: true });
 
 module.exports = mongoose.model("Vote", voteSchema);
