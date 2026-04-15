@@ -1,7 +1,7 @@
 // src/backend/controllers/adminController.js
 
 const User = require("../models/User");
-const Vote = require("../models/Vote");
+const Vote = require("../models/vote");
 const Candidate = require("../models/Candidate");
 
 /* ===========================

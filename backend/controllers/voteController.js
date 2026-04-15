@@ -1,7 +1,7 @@
 // src/backend/controllers/voteController.js
 
 const mongoose = require("mongoose");
-const Vote = require("../models/Vote");
+const Vote = require("../models/vote");
 const Candidate = require("../models/Candidate"); // ✅ FIXED
 const User = require("../models/User");
 
