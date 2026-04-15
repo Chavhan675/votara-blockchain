@@ -1,6 +1,8 @@
+// src/backend/controllers/voteController.js
+
 const mongoose = require("mongoose");
 const Vote = require("../models/Vote");
-const Candidate = require("../models/Candidates");
+const Candidate = require("../models/Candidate"); // ✅ FIXED
 const User = require("../models/User");
 
 /* ================= CAST VOTE ================= */
@@ -9,6 +11,7 @@ exports.castVote = async (req, res) => {
     const { candidateId, electionId } = req.body;
     const userId = req.user.id;
 
+    // ✅ Validate input
     if (!candidateId || !electionId) {
       return res.status(400).json({
         success: false,
@@ -26,6 +29,7 @@ exports.castVote = async (req, res) => {
       });
     }
 
+    // ✅ Check already voted
     const existingVote = await Vote.findOne({
       voter: userId,
       election: electionId
@@ -38,8 +42,8 @@ exports.castVote = async (req, res) => {
       });
     }
 
+    // ✅ Check candidate exists
     const candidate = await Candidate.findById(candidateId);
-
     if (!candidate) {
       return res.status(404).json({
         success: false,
@@ -47,23 +51,27 @@ exports.castVote = async (req, res) => {
       });
     }
 
-    await Vote.create({
+    // ✅ Create vote
+    const vote = await Vote.create({
       voter: userId,
       candidate: candidateId,
       election: electionId
     });
 
+    // ✅ Increment vote count
     await Candidate.findByIdAndUpdate(candidateId, {
       $inc: { voteCount: 1 }
     });
 
+    // ✅ Update user
     await User.findByIdAndUpdate(userId, {
       hasVoted: true
     });
 
     return res.status(201).json({
       success: true,
-      message: "✅ Vote cast successfully"
+      message: "Vote cast successfully",
+      data: vote
     });
 
   } catch (error) {
@@ -76,12 +84,13 @@ exports.castVote = async (req, res) => {
 };
 
 
-/* ================= GET RESULTS (🔥 FIXED) ================= */
+/* ================= GET RESULTS ================= */
 exports.getResults = async (req, res) => {
   try {
     const { electionId } = req.query;
 
     let filter = {};
+
     if (electionId && mongoose.Types.ObjectId.isValid(electionId)) {
       filter.election = electionId;
     }
@@ -89,18 +98,18 @@ exports.getResults = async (req, res) => {
     const candidates = await Candidate.find(filter)
       .sort({ voteCount: -1 });
 
-    // 🔥 FORMAT FIX FOR FRONTEND
     const results = candidates.map(c => ({
       _id: c._id,
       name: c.name,
-      votes: c.voteCount || 0   // ✅ IMPORTANT
+      votes: c.voteCount || 0
     }));
 
-    return res.json(results);   // ✅ RETURN ARRAY DIRECTLY
+    return res.status(200).json(results);
 
   } catch (error) {
     console.error("RESULT ERROR:", error);
     return res.status(500).json({
+      success: false,
       message: "Server Error"
     });
   }
@@ -125,7 +134,7 @@ exports.getVoteStatus = async (req, res) => {
       election: electionId
     });
 
-    return res.json({
+    return res.status(200).json({
       success: true,
       voted: !!vote
     });
